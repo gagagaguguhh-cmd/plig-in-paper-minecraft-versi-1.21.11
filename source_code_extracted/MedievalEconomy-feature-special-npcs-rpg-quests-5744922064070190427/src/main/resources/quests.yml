@@ -1,0 +1,37 @@
+# Default Quests Configuration for Special Economic Quest NPC
+quests:
+  wheat_gather:
+    name: "Panen Gandum Desa"
+    item: "WHEAT"
+    amount: 16
+    reward_dollar: 100.0
+    reward_gold: 1.0
+    reward_exp: 50
+  carrot_gather:
+    name: "Pasokan Wortel Segar"
+    item: "CARROT"
+    amount: 16
+    reward_dollar: 120.0
+    reward_gold: 1.0
+    reward_exp: 60
+  wood_gather:
+    name: "Pengumpulan Kayu Oak"
+    item: "OAK_LOG"
+    amount: 10
+    reward_dollar: 150.0
+    reward_gold: 2.0
+    reward_exp: 75
+  iron_gather:
+    name: "Persediaan Biji Besi"
+    item: "RAW_IRON"
+    amount: 5
+    reward_dollar: 250.0
+    reward_gold: 3.0
+    reward_exp: 100
+  apple_gather:
+    name: "Pengumpulan Apel Segar"
+    item: "APPLE"
+    amount: 8
+    reward_dollar: 180.0
+    reward_gold: 1.5
+    reward_exp: 80

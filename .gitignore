@@ -1,0 +1,33 @@
+```
+# Gradle
+.gradle/
+build/
+target/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.env.*
+```
