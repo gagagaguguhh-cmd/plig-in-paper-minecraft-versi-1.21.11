@@ -1,0 +1,43 @@
+name: MedievalEconomy
+version: 1.0.0
+main: com.medieval.economy.MedievalEconomyPlugin
+api-version: '1.21'
+author: Jules
+description: Plugin Ekonomi Medieval untuk Server Paper 1.21.1
+
+commands:
+  balance:
+    description: Cek saldo Dollar & Gold kamu atau pemain lain.
+    aliases: [bal, uang, dompet]
+    usage: /balance [player]
+  pay:
+    description: Kirim Dollar ke pemain lain.
+    aliases: [transfer, tf]
+    usage: /pay <player> <jumlah>
+  akun:
+    description: Lihat ringkasan profil & statistik ekonomi kamu.
+    aliases: [profile, akunku]
+    usage: /akun
+  shop:
+    description: Buka toko server untuk membeli item.
+    aliases: [toko]
+    usage: /shop
+  sell:
+    description: Buka GUI untuk menjual item dan mendapatkan Dollar.
+    aliases: [jual]
+    usage: /sell
+  auctions:
+    description: Buka pasar lelang (Auction House) antar pemain.
+    aliases: [ah, lelang]
+    usage: /auctions [sell <harga>]
+  order:
+    description: Buka papan pesanan/misi order barang antar pemain.
+    aliases: [orders, misi]
+    usage: /order [create <imbalan_dollar>]
+  settings:
+    description: Buka menu pengaturan server dan UI.
+    aliases: [setting, setelan]
+    usage: /settings
+  rtp:
+    description: Teleportasi acak ke lokasi aman di dunia.
+    usage: /rtp
