@@ -15,7 +15,10 @@ public class NPCManager {
 
     public enum NPCType {
         ECONOMIC_QUEST,
-        RPG_STATS
+        RPG_STATS,
+        MONSTER_RAID,
+        STATUS_UPGRADE,
+        EQUIPMENT_UPGRADE
     }
 
     public static class SpecialNPC {
@@ -135,6 +138,57 @@ public class NPCManager {
         double nearestDistSq = Double.MAX_VALUE;
         for (SpecialNPC npc : activeNpcs.values()) {
             if (npc.getType() == NPCType.RPG_STATS) {
+                if (npc.getHomeLocation().getWorld().equals(location.getWorld())) {
+                    double distSq = npc.getHomeLocation().distanceSquared(location);
+                    if (distSq < nearestDistSq) {
+                        nearestDistSq = distSq;
+                        nearest = npc;
+                    }
+                }
+            }
+        }
+        return nearest;
+    }
+
+    public SpecialNPC getNearestMonsterRaidNPC(Location location) {
+        SpecialNPC nearest = null;
+        double nearestDistSq = Double.MAX_VALUE;
+        for (SpecialNPC npc : activeNpcs.values()) {
+            if (npc.getType() == NPCType.MONSTER_RAID) {
+                if (npc.getHomeLocation().getWorld().equals(location.getWorld())) {
+                    double distSq = npc.getHomeLocation().distanceSquared(location);
+                    if (distSq < nearestDistSq) {
+                        nearestDistSq = distSq;
+                        nearest = npc;
+                    }
+                }
+            }
+        }
+        return nearest;
+    }
+
+    public SpecialNPC getNearestStatusUpgradeNPC(Location location) {
+        SpecialNPC nearest = null;
+        double nearestDistSq = Double.MAX_VALUE;
+        for (SpecialNPC npc : activeNpcs.values()) {
+            if (npc.getType() == NPCType.STATUS_UPGRADE) {
+                if (npc.getHomeLocation().getWorld().equals(location.getWorld())) {
+                    double distSq = npc.getHomeLocation().distanceSquared(location);
+                    if (distSq < nearestDistSq) {
+                        nearestDistSq = distSq;
+                        nearest = npc;
+                    }
+                }
+            }
+        }
+        return nearest;
+    }
+
+    public SpecialNPC getNearestEquipmentUpgradeNPC(Location location) {
+        SpecialNPC nearest = null;
+        double nearestDistSq = Double.MAX_VALUE;
+        for (SpecialNPC npc : activeNpcs.values()) {
+            if (npc.getType() == NPCType.EQUIPMENT_UPGRADE) {
                 if (npc.getHomeLocation().getWorld().equals(location.getWorld())) {
                     double distSq = npc.getHomeLocation().distanceSquared(location);
                     if (distSq < nearestDistSq) {

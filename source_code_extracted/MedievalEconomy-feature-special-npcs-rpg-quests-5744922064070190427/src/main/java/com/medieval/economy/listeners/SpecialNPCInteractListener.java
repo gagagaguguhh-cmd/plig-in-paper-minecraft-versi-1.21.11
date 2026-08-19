@@ -66,6 +66,42 @@ public class SpecialNPCInteractListener implements Listener {
             handleRPGStatsNPCInteract(player);
         } else if (type == NPCManager.NPCType.ECONOMIC_QUEST) {
             handleEconomicQuestNPCInteract(player);
+        } else if (type == NPCManager.NPCType.STATUS_UPGRADE) {
+            handleStatusUpgradeNPCInteract(player);
+        } else if (type == NPCManager.NPCType.EQUIPMENT_UPGRADE) {
+            handleEquipmentUpgradeNPCInteract(player);
+        }
+    }
+
+    private void handleStatusUpgradeNPCInteract(Player player) {
+        UUID uuid = player.getUniqueId();
+        if (!rpgManager.isInitiated(uuid)) {
+            player.sendMessage(Component.text("🧘 [Master Status]: ", NamedTextColor.LIGHT_PURPLE, TextDecoration.BOLD)
+                    .append(Component.text("Kamu harus menemui Tetua RPG Desa terlebih dahulu!", NamedTextColor.RED)));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            return;
+        }
+
+        // Forward to SpecialNPCUpgradeListener
+        SpecialNPCUpgradeListener upgradeListener = plugin.getUpgradeListener();
+        if (upgradeListener != null) {
+            upgradeListener.openStatusUpgradeGUI(player);
+        }
+    }
+
+    private void handleEquipmentUpgradeNPCInteract(Player player) {
+        UUID uuid = player.getUniqueId();
+        if (!rpgManager.isInitiated(uuid)) {
+            player.sendMessage(Component.text("🔨 [Pandai Besi Legendaris]: ", NamedTextColor.GOLD, TextDecoration.BOLD)
+                    .append(Component.text("Kamu harus menemui Tetua RPG Desa terlebih dahulu!", NamedTextColor.RED)));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            return;
+        }
+
+        // Forward to SpecialNPCUpgradeListener
+        SpecialNPCUpgradeListener upgradeListener = plugin.getUpgradeListener();
+        if (upgradeListener != null) {
+            upgradeListener.openEquipmentUpgradeGUI(player);
         }
     }
 

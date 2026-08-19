@@ -36,15 +36,17 @@ public class SpecialNPCInteractListener implements Listener {
     private final RPGManager rpgManager;
     private final QuestManager questManager;
     private final EconomyManager economyManager;
+    private final MonsterKekuatanManager monsterKekuatanManager;
     private final NamespacedKey npcTypeKey;
     private final NamespacedKey questIdKey;
 
-    public SpecialNPCInteractListener(MedievalEconomyPlugin plugin, NPCManager npcManager, RPGManager rpgManager, QuestManager questManager, EconomyManager economyManager, NamespacedKey npcTypeKey) {
+    public SpecialNPCInteractListener(MedievalEconomyPlugin plugin, NPCManager npcManager, RPGManager rpgManager, QuestManager questManager, EconomyManager economyManager, MonsterKekuatanManager monsterKekuatanManager, NamespacedKey npcTypeKey) {
         this.plugin = plugin;
         this.npcManager = npcManager;
         this.rpgManager = rpgManager;
         this.questManager = questManager;
         this.economyManager = economyManager;
+        this.monsterKekuatanManager = monsterKekuatanManager;
         this.npcTypeKey = npcTypeKey;
         this.questIdKey = new NamespacedKey(plugin, "offered_quest_id");
     }
@@ -66,7 +68,88 @@ public class SpecialNPCInteractListener implements Listener {
             handleRPGStatsNPCInteract(player);
         } else if (type == NPCManager.NPCType.ECONOMIC_QUEST) {
             handleEconomicQuestNPCInteract(player);
+        } else if (type == NPCManager.NPCType.MONSTER_RAID) {
+            handleMonsterRaidNPCInteract(player);
         }
+    }
+
+    private void handleMonsterRaidNPCInteract(Player player) {
+        UUID uuid = player.getUniqueId();
+        if (!rpgManager.isInitiated(uuid)) {
+            player.sendMessage(Component.text("👹 [Pemberi Misi Monster]: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
+                    .append(Component.text("Kamu harus menemui Tetua RPG Desa terlebih dahulu sebelum menerima misi monster!", NamedTextColor.RED)));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+            return;
+        }
+
+        openMonsterRaidGUI(player);
+    }
+
+    public void openMonsterRaidGUI(Player player) {
+        UUID uuid = player.getUniqueId();
+        Inventory gui = Bukkit.createInventory(null, 27, Component.text("👹 Misi Raid Monster", NamedTextColor.DARK_RED));
+
+        int kekuatan = monsterKekuatanManager.getKekuatan(uuid);
+        int totalKilled = monsterKekuatanManager.getTotalMonsterKilled(uuid);
+        boolean canRaid = monsterKekuatanManager.canStartRaid(uuid);
+        long cooldownRemaining = monsterKekuatanManager.getRaidCooldownRemaining(uuid);
+
+        ItemStack raidItem = new ItemStack(canRaid ? Material.DIAMOND_SWORD : Material.BARRIER);
+        ItemMeta raidMeta = raidItem.getItemMeta();
+        if (raidMeta != null) {
+            raidMeta.displayName(Component.text((canRaid ? "⚔️" : "🔒") + " Mulai Raid Monster", NamedTextColor.RED, TextDecoration.BOLD));
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.text("─────────────────────────", NamedTextColor.DARK_GRAY));
+            lore.add(Component.text("💪 Kekuatanmu: ", NamedTextColor.GRAY).append(Component.text(kekuatan, NamedTextColor.AQUA, TextDecoration.BOLD)));
+            lore.add(Component.text("☠️ Total Monster Dibunuh: ", NamedTextColor.GRAY).append(Component.text(totalKilled, NamedTextColor.DARK_RED)));
+            lore.add(Component.text("─────────────────────────", NamedTextColor.DARK_GRAY));
+            if (canRaid) {
+                lore.add(Component.text("📍 Koordinat Raid:", NamedTextColor.YELLOW));
+                Location raidLoc = generateRaidLocation(player.getLocation());
+                lore.add(Component.text("   X: " + raidLoc.getBlockX(), NamedTextColor.GRAY));
+                lore.add(Component.text("   Y: " + raidLoc.getBlockY(), NamedTextColor.GRAY));
+                lore.add(Component.text("   Z: " + raidLoc.getBlockZ(), NamedTextColor.GRAY));
+                lore.add(Component.text("   Dunia: " + raidLoc.getWorld().getName(), NamedTextColor.GRAY));
+                lore.add(Component.text("─────────────────────────", NamedTextColor.DARK_GRAY));
+                lore.add(Component.text("👉 KLIK UNTUK MENERIMA MISI RAID!", NamedTextColor.GREEN, TextDecoration.BOLD));
+            } else {
+                long minutes = cooldownRemaining / 60000;
+                long seconds = (cooldownRemaining % 60000) / 1000;
+                lore.add(Component.text("❌ Cooldown: " + minutes + "m " + seconds + "s", NamedTextColor.RED));
+                lore.add(Component.text("Tunggu sebelum memulai raid baru!", NamedTextColor.GRAY));
+            }
+            raidMeta.lore(lore);
+            raidItem.setItemMeta(raidMeta);
+        }
+        gui.setItem(13, raidItem);
+
+        // Background filler
+        ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta fillerMeta = filler.getItemMeta();
+        if (fillerMeta != null) {
+            fillerMeta.displayName(Component.text(" "));
+            filler.setItemMeta(fillerMeta);
+        }
+        for (int i = 0; i < gui.getSize(); i++) {
+            if (gui.getItem(i) == null) {
+                gui.setItem(i, filler);
+            }
+        }
+
+        player.openInventory(gui);
+    }
+
+    private Location generateRaidLocation(Location playerLoc) {
+        World world = playerLoc.getWorld();
+        Random rand = new Random();
+        // Generate random coordinates within 500-1500 blocks from player
+        int offsetX = (rand.nextInt(1000) + 500) * (rand.nextBoolean() ? 1 : -1);
+        int offsetZ = (rand.nextInt(1000) + 500) * (rand.nextBoolean() ? 1 : -1);
+        int x = playerLoc.getBlockX() + offsetX;
+        int z = playerLoc.getBlockZ() + offsetZ;
+        // Find highest block at that location
+        int y = world.getHighestBlockYAt(x, z);
+        return new Location(world, x, y, z);
     }
 
     private void handleRPGStatsNPCInteract(Player player) {
@@ -276,6 +359,36 @@ public class SpecialNPCInteractListener implements Listener {
                         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
                     }
                 }
+            }
+        } else if (title.toString().contains("Misi Raid Monster")) {
+            event.setCancelled(true);
+            int slot = event.getRawSlot();
+            if (slot != 13) return;
+
+            UUID uuid = player.getUniqueId();
+            boolean canRaid = monsterKekuatanManager.canStartRaid(uuid);
+
+            if (canRaid) {
+                Location raidLoc = generateRaidLocation(player.getLocation());
+                monsterKekuatanManager.setLastRaidTime(uuid, System.currentTimeMillis());
+
+                player.sendMessage(Component.text("--------------------------------------------------", NamedTextColor.DARK_GRAY));
+                player.sendMessage(Component.text("⚔️ MISI RAID MONSTER DITERIMA!", NamedTextColor.RED, TextDecoration.BOLD));
+                player.sendMessage(Component.text("📍 Koordinat Target:", NamedTextColor.YELLOW));
+                player.sendMessage(Component.text("   X: " + raidLoc.getBlockX(), NamedTextColor.GRAY));
+                player.sendMessage(Component.text("   Y: " + raidLoc.getBlockY(), NamedTextColor.GRAY));
+                player.sendMessage(Component.text("   Z: " + raidLoc.getBlockZ(), NamedTextColor.GRAY));
+                player.sendMessage(Component.text("   Dunia: " + raidLoc.getWorld().getName(), NamedTextColor.GRAY));
+                player.sendMessage(Component.text("─────────────────────────", NamedTextColor.DARK_GRAY));
+                player.sendMessage(Component.text("💪 Bunuh monster di lokasi tersebut untuk meningkatkan Kekuatanmu!", NamedTextColor.AQUA));
+                player.sendMessage(Component.text("⏰ Cooldown: 5 menit setelah memulai.", NamedTextColor.GRAY));
+                player.sendMessage(Component.text("--------------------------------------------------", NamedTextColor.DARK_GRAY));
+                player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 0.8f);
+
+                player.closeInventory();
+            } else {
+                player.sendMessage(Component.text("❌ Kamu masih dalam cooldown raid!", NamedTextColor.RED));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             }
         }
     }

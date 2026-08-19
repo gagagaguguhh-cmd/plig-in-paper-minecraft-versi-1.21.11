@@ -18,6 +18,7 @@ public class MedievalEconomyPlugin extends JavaPlugin {
     private RPGManager rpgManager;
     private NPCManager npcManager;
     private QuestManager questManager;
+    private MonsterKekuatanManager monsterKekuatanManager;
 
     @Override
     public void onEnable() {
@@ -33,6 +34,7 @@ public class MedievalEconomyPlugin extends JavaPlugin {
         this.rpgManager = new RPGManager(this);
         this.npcManager = new NPCManager(this);
         this.questManager = new QuestManager(this);
+        this.monsterKekuatanManager = new MonsterKekuatanManager(this);
 
         // Register commands
         getCommand("balance").setExecutor(new BalanceCommand(economyManager));
@@ -54,7 +56,7 @@ public class MedievalEconomyPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new RTPDimensionUnlockListener(rtpManager), this);
         getServer().getPluginManager().registerEvents(new CommandBlockerListener(), this);
         getServer().getPluginManager().registerEvents(specialNPCListener, this);
-        getServer().getPluginManager().registerEvents(new SpecialNPCInteractListener(this, npcManager, rpgManager, questManager, economyManager, specialNPCListener.getNpcTypeKey()), this);
+        getServer().getPluginManager().registerEvents(new SpecialNPCInteractListener(this, npcManager, rpgManager, questManager, economyManager, monsterKekuatanManager, specialNPCListener.getNpcTypeKey()), this);
         getServer().getPluginManager().registerEvents(new RPGTrackingListener(this, rpgManager, npcManager), this);
 
         getLogger().info("MedievalEconomy plugin 1.0.0 (Command Blocker & UI & RTP & Special NPCs & RPG Quests) berhasil diaktifkan!");
@@ -85,6 +87,9 @@ public class MedievalEconomyPlugin extends JavaPlugin {
         }
         if (questManager != null) {
             questManager.savePlayerQuests();
+        }
+        if (monsterKekuatanManager != null) {
+            monsterKekuatanManager.saveData();
         }
         getLogger().info("MedievalEconomy plugin telah dinonaktifkan.");
     }
