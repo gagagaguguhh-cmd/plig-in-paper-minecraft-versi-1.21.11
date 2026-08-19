@@ -4,13 +4,21 @@
 build/
 target/
 
-# Java
-*.class
-*.jar
-*.war
-*.ear
+# Dependencies
+libs/
+lib/
 
-# IDE
+# Temp files
+*.tmp
+*.temp
+build_temp/
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
 .vscode/
 .idea/
 *.swp
@@ -19,15 +27,15 @@ target/
 # Logs
 *.log
 
-# Temp files
-*.tmp
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Environment
-.env
-.env.local
-*.env.*
+# Compressed files
+*.zip
+*.jar
+*.tar
+*.gz
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
 ```

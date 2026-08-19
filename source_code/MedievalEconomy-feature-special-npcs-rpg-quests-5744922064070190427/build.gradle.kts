@@ -1,9 +1,9 @@
 plugins {
-    java
+    `java-library`
 }
 
 group = "com.medieval.economy"
-version = "1.1.0"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -15,11 +15,15 @@ dependencies {
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    options.release.set(17)
+}
+
+tasks.jar {
+    archiveFileName.set("MedievalEconomy-1.2.jar")
 }
